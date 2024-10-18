@@ -3,9 +3,14 @@
 // Execute `rustlings hint iterators4` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
 
 pub fn factorial(num: u64) -> u64 {
+    (1..=num).product()
+    //1..=num：
+    //这是一个范围表达式，表示从 1 到 num（包括 num）的所有整数。
+    //.product()：
+    //这是一个迭代器适配器，它会计算迭代器中所有元素的乘积。
+    //由于 1..=num 生成的是一个 u64 类型的迭代器，.product() 会返回一个 u64 类型的结果。
     // Complete this function to return the factorial of num
     // Do not use:
     // - return
