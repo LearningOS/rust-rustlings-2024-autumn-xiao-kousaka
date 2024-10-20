@@ -2,11 +2,12 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
+
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
 use std::vec::*;
+use std::cmp::Ordering;
 
 #[derive(Debug)]
 struct Node<T> {
@@ -29,13 +30,13 @@ struct LinkedList<T> {
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T:Clone> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T:Clone> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -69,14 +70,46 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-        let mut res = LinkedList<T>::new();
+	pub fn merge(mut list_a:LinkedList<T>,mut list_b:LinkedList<T>) -> Self
+    where
+        T: Ord,
+    {
+        let mut res = LinkedList::new();
 
-        let mut index1 = 0;
-        let mut index2 = 0;
+        while let (Some(a), Some(b)) = (list_a.start, list_b.start) {
+            unsafe {
+                match (*a.as_ptr()).val.cmp(&(*b.as_ptr()).val) {
+                    Ordering::Less => {
+                        res.add((*a.as_ptr()).val.clone());
+                        list_a.start = (*a.as_ptr()).next;
+                    }
+                    Ordering::Greater => {
+                        res.add((*b.as_ptr()).val.clone());
+                        list_b.start = (*b.as_ptr()).next;
+                    }
+                    Ordering::Equal => {
+                        res.add((*a.as_ptr()).val.clone());
+                        res.add((*b.as_ptr()).val.clone());
+                        list_a.start = (*a.as_ptr()).next;
+                        list_b.start = (*b.as_ptr()).next;
+                    }
+                }
+            }
+        }
 
-        
+        while let Some(a) = list_a.start {
+            unsafe {
+                res.add((*a.as_ptr()).val.clone());
+                list_a.start = (*a.as_ptr()).next;
+            }
+        }
+
+        while let Some(b) = list_b.start {
+            unsafe {
+                res.add((*b.as_ptr()).val.clone());
+                list_b.start = (*b.as_ptr()).next;
+            }
+        }
 
         res
 	}
